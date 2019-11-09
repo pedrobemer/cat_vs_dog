@@ -123,7 +123,7 @@ def data_augmentation():
 
 
 def train_conv_net(model, train_generator, val_generator, lr_rate):
-    file_save = 'cats_and_dogs_' + str(lr_rate) +'.h5'
+    file_save = 'repelente_vs_copo' + str(lr_rate) +'.h5'
     model.compile(loss='binary_crossentropy',
                 optimizer=optimizers.Adam(learning_rate=lr_rate),
                 metrics=['acc'])
