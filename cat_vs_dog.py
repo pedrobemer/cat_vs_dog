@@ -146,7 +146,7 @@ lr_rate = [1e-5, 1e-4, 5e-4, 1e-3, 5e-3, 1e-2, 5e-2, 1e-1, 5e-1, 1]
 train_gen = read_train_dataset(base_dir)
 val_gen = read_val_dataset(base_dir)
 test_gen = read_test_dataset(base_dir)
-model = create_conv_net()
 for i in lr_rate:
     print(i)
+    model = create_conv_net()
     train_conv_net(model, train_gen,val_gen, i)
