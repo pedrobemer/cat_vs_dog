@@ -10,9 +10,7 @@ import os, shutil
 
 
 
-def create_folders():
-    original_dataset_dir = 'train'
-    base_dir = 'myDataset'
+def create_folders(original_dataset_dir,base_dir):
     os.mkdir(base_dir)
     train_dir = os.path.join(base_dir, 'train')
     os.mkdir(train_dir)
@@ -20,48 +18,48 @@ def create_folders():
     os.mkdir(validation_dir)
     test_dir = os.path.join(base_dir, 'test')
     os.mkdir(test_dir)
-    train_cats_dir = os.path.join(train_dir, 'cats')
+    train_cats_dir = os.path.join(train_dir, 'copo')
     os.mkdir(train_cats_dir)
-    train_dogs_dir = os.path.join(train_dir, 'dogs')
+    train_dogs_dir = os.path.join(train_dir, 'repelente')
     os.mkdir(train_dogs_dir)
-    validation_cats_dir = os.path.join(validation_dir, 'cats')
+    validation_cats_dir = os.path.join(validation_dir, 'copo')
     os.mkdir(validation_cats_dir)
-    validation_dogs_dir = os.path.join(validation_dir, 'dogs')
+    validation_dogs_dir = os.path.join(validation_dir, 'repelente')
     os.mkdir(validation_dogs_dir)
-    test_cats_dir = os.path.join(test_dir, 'cats')
+    test_cats_dir = os.path.join(test_dir, 'copo')
     os.mkdir(test_cats_dir)
-    test_dogs_dir = os.path.join(test_dir, 'dogs')
+    test_dogs_dir = os.path.join(test_dir, 'repelente')
     os.mkdir(test_dogs_dir)
 
 
-    fnames = ['cat.{}.jpg'.format(i) for i in range(3000)]
+    fnames = ['copo.{}.jpg'.format(i) for i in range(1,70)]
     for fname in fnames:
         src = os.path.join(original_dataset_dir, fname)
         dst = os.path.join(train_cats_dir, fname)
         shutil.copyfile(src, dst)
-        fnames = ['dog.{}.jpg'.format(i) for i in range(3000)]
+        fnames = ['repelente.{}.jpg'.format(i) for i in range(1,70)]
     for fname in fnames:
         src = os.path.join(original_dataset_dir, fname)
         dst = os.path.join(train_dogs_dir, fname)
         shutil.copyfile(src, dst)
 
-    fnames = ['cat.{}.jpg'.format(i) for i in range(3000, 4000)]
+    fnames = ['copo.{}.jpg'.format(i) for i in range(71, 95)]
     for fname in fnames:
         src = os.path.join(original_dataset_dir, fname)
         dst = os.path.join(validation_cats_dir, fname)
         shutil.copyfile(src, dst)
-    fnames = ['dog.{}.jpg'.format(i) for i in range(3000, 4000)]
+    fnames = ['repelente.{}.jpg'.format(i) for i in range(71, 95)]
     for fname in fnames:
         src = os.path.join(original_dataset_dir, fname)
         dst = os.path.join(validation_dogs_dir, fname)
         shutil.copyfile(src, dst)
 
-    fnames = ['cat.{}.jpg'.format(i) for i in range(4000, 5000)]
+    fnames = ['copo.{}.jpg'.format(i) for i in range(96, 120)]
     for fname in fnames:
         src = os.path.join(original_dataset_dir, fname)
         dst = os.path.join(test_cats_dir, fname)
         shutil.copyfile(src, dst)
-    fnames = ['dog.{}.jpg'.format(i) for i in range(4000, 5000)]
+    fnames = ['repelente.{}.jpg'.format(i) for i in range(96, 120)]
     for fname in fnames:
         src = os.path.join(original_dataset_dir, fname)
         dst = os.path.join(test_dogs_dir, fname)
@@ -129,33 +127,35 @@ def train_conv_net(model, train_generator, val_generator, lr_rate):
     model.compile(loss='binary_crossentropy',
                 optimizer=optimizers.Adam(learning_rate=lr_rate),
                 metrics=['acc'])
-    history = model.fit_generator(train_generator, steps_per_epoch=200, epochs=40,
-                                  validation_data=val_generator,
+    history = model.fit_generator(train_generator, steps_per_epoch=200,
+                                  epochs=40, validation_data=val_generator,
                                   validation_steps=80,
                                   callbacks=[
                                              callbacks.EarlyStopping(
-                                                monitor="val_loss", min_delta=1e-7, patience=5, restore_best_weights=True
+                                                monitor="val_loss",
+                                                min_delta=1e-7, patience=5,
+                                                restore_best_weights=True
                                              ),
                                              callbacks.ModelCheckpoint(
-                                                filepath=file_save, monitor="val_loss", verbose=1, save_best_only=True
+                                                filepath=file_save,
+                                                monitor="val_loss", verbose=1,
+                                                save_best_only=True
                                              ),
-                                            #  callbacks.ReduceLROnPlateau(
-                                            #     factor=0.5, min_delta=1e-7, patience=3, cooldown=15, verbose=1, min_lr=1e-6
-                                            #  ),
-    ])
+                                            ]
+                                 )
     model.save(file_save)
 
 config = ConfigProto()
 config.gpu_options.allow_growth = True
 backend.set_session(Session(config=config))
-# create_dataset()
-base_dir = 'myDataset'
-lr_rate = [1e-5, 1e-4, 5e-4, 1e-3, 5e-3, 1e-2, 5e-2, 1e-1, 5e-1, 1]
-# lr_rate = [0.00001, 0.0001, 0.0005, 0.0010, 0.005, 0.01, 0.05, 0.1, 0.5, 1]
+base_dir = 'myDataset2'
+original_dataset_dir = 'pedro-dataset'
+# create_folders(original_dataset_dir,base_dir)
+lr_rate = [0.00001, 0.0001, 0.0005, 0.0010, 0.005, 0.01, 0.05, 0.1, 0.5, 1]
 train_gen = read_train_dataset(base_dir)
 val_gen = read_val_dataset(base_dir)
 test_gen = read_test_dataset(base_dir)
-model = create_conv_net()
 for i in lr_rate:
     print(i)
+    model = create_conv_net()
     train_conv_net(model, train_gen,val_gen, i)
